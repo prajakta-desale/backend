@@ -7,4 +7,16 @@ router.post(
     '/register',
     vendorController.register
 );
+router.put(
+    '/update',
+    vendorController.updateVendorDetails
+);
+router.get(
+    '/list',
+    vendorController.getVendorList
+);
+router.get(
+    '/get',
+    vendorController.getSingleVendor
+);
 export default router

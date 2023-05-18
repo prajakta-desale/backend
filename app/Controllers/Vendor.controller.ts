@@ -36,7 +36,8 @@ const register: IController = async (req, res) => {
 const updateVendorDetails: IController = async (req, res) => {
     let vendor;
     try {
-        vendor = await vendorService.updateVendorDetails(req.body);
+        let id  = req.query.id
+        vendor = await vendorService.updateVendorDetails(req.body, id);
         if (vendor instanceof Error) {
             apiResponse.error(res, httpStatusCodes.BAD_REQUEST);
         } else {

@@ -25,7 +25,7 @@ export default async (
     ) === -1
   ) {
     const authorizationHeader = extractCookieFromRequest(
-      req, 'token'
+      req, 'x-fleet-token'
     );
     console.log("authorizationHeader ->", authorizationHeader);
     if (authorizationHeader) {

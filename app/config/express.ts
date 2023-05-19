@@ -5,9 +5,9 @@ const morgan = require('morgan');
 import application from '../Constants/application';
 import indexRoute from '../Routes/index';
 import joiErrorHandler from '../Middlewares/joiErrorHandler';
-//import * as errorHandler from '../middlewares/apiErrorHandler';
+// import * as errorHandler from '../middlewares/apiErrorHandler';
 import Authenticate from '../Middlewares/Authenticate';
-
+var cors = require('cors')
 const app = express();
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -23,7 +23,7 @@ require('dotenv').config();
 app.use(bodyParser.json());
 app.use(morgan('dev'));
 app.use(Authenticate);
-
+app.use(cors())
 // Router
 app.use(application.url.base, indexRoute);
 

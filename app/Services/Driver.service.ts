@@ -1,67 +1,125 @@
 import Encryption from "../utilities/Encryption";
 import {DriverModel} from "../Models/Driver/Driver.model";
-import {VendorModel} from "../Models/Vendor/Vendor.model";
+import formidable from "formidable";
+import fs from "fs"
+import path from "path"
 
-
-const addDriver = async (req : any) => {
-    let driver,data: any = {}
+const addDriver = async (req : any, res:any) => {
+    let driver,fields,files ;
+        let data: any = {}
     try {
-        if (req.name == undefined || req.name == null || req.name == "") throw new Error("name is required");
-        data.name = req.name;
-        if (req.email == undefined || req.email == null || req.email == "") throw new Error(" email is required");
-        data.email = req.email;
-        if (req.password == undefined || req.password == null || req.password == "") throw new Error(" password is required");
-        if (req.confirm_password == undefined || req.confirm_password == null || req.confirm_password == "") throw new Error(" confirm password");
-        if (data.password !== data.confirm_password) throw new Error("password did not match");
-        let hash = await new Encryption().generateHash(req.password, 10);
+        // @ts-ignore
+        ({fields, files} = await new Promise((resolve) => {
+            new formidable.IncomingForm().parse(req, async (err: any, fields: any, files: any) => {
+                resolve({fields: fields, files: files});
+            })
+        }));
+        if (!fields?.name) throw new Error('name is required');
+        data.name = fields.name;
+         if (!fields.email) throw new Error(" email is required");
+        data.email = fields.email;
+        if (!fields.password) throw new Error(" password is required");
+        if (!fields.confirm_password) throw new Error(" confirm password");
+        if (fields.password !== fields.confirm_password) throw new Error("password did not match");
+        // hashing password
+        let hash = await new Encryption().generateHash(fields?.password, 10);
         data.password = hash;
-        delete req.confirm_password;
+        delete fields.confirm_password;
         // data.password = req.password;
-        if (req.location == undefined || req.location == null || req.location == "") throw new Error(" city is required");
-        data.location = req.location;
-        if (req.phone_no == undefined || req.phone_no == null || req.phone_no == "") throw new Error(" mobile no  is required");
-        data.phone_no = req.phone_no;
-        if (req.total_trips == undefined || req.total_trips == null || req.total_trips == "") throw new Error("name is required");
-        data.total_trips = req.total_trips;
-        if (req.last_trip == undefined || req.last_trip == null || req.last_trip == "") throw new Error(" date is required");
-        data.last_trip = req.last_trip;
-        if (req.licence_no == undefined || req.licence_no == null || req.licence_no == "") throw new Error("licence no is required");
-        data.licence_no = req.licence_no;
-        if (req.licence_url == undefined || req.licence_url == null || req.licence_url == "") throw new Error("licence image is required");
-        data.licence_url = req.licence_url;
-        if (req.vendor_id == undefined || req.vendor_id == null || req.vendor_id == "") throw new Error("vendor_id is required");
-        data.vendor_id = req.vendor_id;
+        if (!fields.location) throw new Error(" city is required");
+        data.location = fields.location;
+        if (!fields.phone_no) throw new Error(" mobile no  is required");
+        data.phone_no = fields.phone_no;
+        if (!fields.total_trips) throw new Error("name is required");
+        data.total_trips = fields.total_trips;
+        if (!fields.last_trip) throw new Error(" date is required");
+        data.last_trip = fields.last_trip;
+        if (!fields.licence_no) throw new Error("licence no is required");
+        data.licence_no = fields.licence_no;
+        if (!fields.vendor_id) throw new Error("licence no is required");        
+        data.vendor_id = fields.vendor_id;
         data.role_id = 3;
+        // file uploading
+        if(!files?.licence) throw new Error("licence image is required");else{
+            if (fileNotValid(files.licence.mimetype)) throw new Error("Only .png, .jpg , .jpeg and .pdf format allowed! for image");
+            var file = files.licence;
+        }
+        const oldPath = file.filepath;
+        const uniqueFileName = `public/${file.originalFilename}-${Date.now()}`;
+        const newPath = path.join(uniqueFileName);
+        data.licence_url = newPath
+        //@ts-ignore
+        fs.rename(oldPath, newPath, (err) => {
+            if (err) {
+              // Handle the error
+              console.log("error while uploading file")
+              return;
+            }
+            console.log("file uploaded successfully")
+             
+          });
         driver = await new DriverModel().AddDriver(data)
         return driver
     }
     catch (e:any) {
-        throw e
+            console.log("error",e)
+            throw e
     }
 }
-const updateDriverDetails = async (req : any, id:any) => {
-    let driver,data: any = {}
+
+const fileNotValid = (type: any) => {
+    if (type == 'image/jpeg' || type == 'image/jpg' || type == 'image/png'|| type == 'image/pdf') {
+        return false;
+    }
+    return true;
+};
+const updateDriverDetails = async (req : any) => {
+    let driver,fields,files ;
+        let data: any = {}
+        let id = req.query.id
     try {
-        if (req.name == undefined || req.name == null || req.name == "") throw new Error("name is required");
-        data.name = req.name;
-        if (req.email == undefined || req.email == null || req.email == "") throw new Error(" email is required");
-        data.email = req.email;
-        // data.password = req.password;
-        if (req.location == undefined || req.location == null || req.location == "") throw new Error(" city is required");
-        data.location = req.location;
-        if (req.phone_no == undefined || req.phone_no == null || req.phone_no == "") throw new Error(" mobile no  is required");
-        data.phone_no = req.phone_no;
-        if (req.total_trips == undefined || req.total_trips == null || req.total_trips == "") throw new Error("name is required");
-        data.total_trips = req.total_trips;
-        if (req.last_trip == undefined || req.last_trip == null || req.last_trip == "") throw new Error(" date is required");
-        data.last_trip = req.last_trip;
-        if (req.licence_no == undefined || req.licence_no == null || req.licence_no == "") throw new Error("licence no is required");
-        data.licence_no = req.licence_no;
-        if (req.licence_url == undefined || req.licence_url == null || req.licence_url == "") throw new Error("licence image is required");
-        data.licence_url = req.licence_url;
-        if (req.vendor_id == undefined || req.vendor_id == null || req.vendor_id == "") throw new Error("vendor_id is required");
-        data.vendor_id = req.vendor_id;
+        // @ts-ignore
+        ({fields, files} = await new Promise((resolve) => {
+            new formidable.IncomingForm().parse(req, async (err: any, fields: any, files: any) => {
+                resolve({fields: fields, files: files});
+            })
+        }));
+        if (!fields?.name) throw new Error('name is required');
+        data.name = fields.name;
+         if (!fields.email) throw new Error(" email is required");
+        data.email = fields.email;
+        if (!fields.location) throw new Error(" city is required");
+        data.location = fields.location;
+        if (!fields.phone_no) throw new Error(" mobile no  is required");
+        data.phone_no = fields.phone_no;
+        if (!fields.total_trips) throw new Error("name is required");
+        data.total_trips = fields.total_trips;
+        if (!fields.last_trip) throw new Error(" date is required");
+        data.last_trip = fields.last_trip;
+        if (!fields.licence_no) throw new Error("licence no is required");
+        data.licence_no = fields.licence_no;
+        if (fields.vendor_id == undefined || fields.vendor_id == null || fields.vendor_id == "") throw new Error("vendor_id is required");
+        data.vendor_id = fields.vendor_id;
         data.role_id = 3;
+        // file uploading
+        if(!files?.licence) throw new Error("licence image is required");else{
+            if (fileNotValid(files.licence.mimetype)) throw new Error("Only .png, .jpg , .jpeg and .pdf format allowed! for image");
+            var file = files.licence;
+        }
+        const oldPath = file.filepath;
+        const uniqueFileName = `public/${file.originalFilename}-${Date.now()}`;
+        const newPath = path.join(uniqueFileName);
+        data.licence_url = newPath
+        //@ts-ignore
+        fs.rename(oldPath, newPath, (err) => {
+            if (err) {
+              // Handle the error
+              console.log("error while uploading file")
+              return;
+            }
+            console.log("file uploaded successfully")
+             
+          });
         driver = await new DriverModel().UpdateDriverDetails(data,id)
         return driver
     }
@@ -113,5 +171,6 @@ export default {
                 addDriver,
                 updateDriverDetails,
                 getDriverList,
-                getDriverByID
+                getDriverByID,
+                
 }

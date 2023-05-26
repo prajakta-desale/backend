@@ -1,7 +1,7 @@
 import * as bodyParser from 'body-parser';
 import express from 'express';
 const morgan = require('morgan');
-
+const path = require('path');
 import application from '../Constants/application';
 import indexRoute from '../Routes/index';
 import joiErrorHandler from '../Middlewares/joiErrorHandler';
@@ -22,11 +22,13 @@ app.use(function(req, res, next) {
 require('dotenv').config();
 app.use(bodyParser.json());
 app.use(morgan('dev'));
+
 app.use(Authenticate);
 app.use(cors())
 // Router
-app.use(application.url.base, indexRoute);
-
+app.use(indexRoute);
+// destination to upload file
+app.use(express.static(path.join(__dirname,'public')))
 // Joi Error Handler
 app.use(joiErrorHandler);
 // Error Handler

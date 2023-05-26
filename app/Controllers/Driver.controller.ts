@@ -3,12 +3,13 @@ import driverService from "../Services/Driver.service";
 import apiResponse from "../utilities/ApiResponse";
 import httpStatusCodes from "http-status-codes";
 import constants from "../Constants";
+ 
 
 
-const register: IController = async (req, res) => {
-    let driver;
+const register: IController = async(req: any, res:any) => {
+    let driver; 
     try {
-         driver = await driverService.addDriver(req.body);
+         driver = await driverService.addDriver(req,res);
         if (driver instanceof Error) {
             apiResponse.error(res, httpStatusCodes.BAD_REQUEST);
         } else {
@@ -32,11 +33,12 @@ const register: IController = async (req, res) => {
         }
         return;
     }
+    
 };
 const updateDriverDetails: IController = async (req, res) => {
     let driver;
     try {
-        driver = await driverService.updateDriverDetails(req.body,req.query.id);
+        driver = await driverService.updateDriverDetails(req);
         if (driver instanceof Error) {
             apiResponse.error(res, httpStatusCodes.BAD_REQUEST);
         } else {
@@ -101,9 +103,12 @@ const getDriverByID: IController = async (req, res) => {
     }
     return;
 };
+
+
 export default {
                 register,
                 updateDriverDetails,
                 getDriverList,
                 getDriverByID
+                
 }

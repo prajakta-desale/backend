@@ -14,7 +14,7 @@ export default {
         `${base}/user/login`,
         `${base}/vendor/register`,
         `${base}/customer/verify-OTP`,
-        `${base}/admin/sign-in`,
+        `/admin/sign-in`,
     ],
 };
 

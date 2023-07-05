@@ -1,26 +1,89 @@
-import BaseModel from "../BaseModel";
+import baseModel from "../BaseModel";
+export class UserModel extends baseModel {
+  constructor() {
+    super();
+  }
 
-export class UserModel extends BaseModel   {
-    constructor() {
-        super();
+  async getUser(data: any) {
+    return await this._executeQuery(
+      "select id,role_id,first_name, last_name, email, password,status from user where email = ?  ",
+      [data.email]
+    );
+  }
+  // async getLogin(email:any,password:any){
+  // let tableName = "admin"
+  // const queryResult = await this._executeQuery('SELECT id, email, password FROM ' + tableName + ' WHERE email = ?', [email]);
+  // return queryResult
+  // // const user = queryResult.rows[0];
+  // }
+
+  // Check the user table
+  async userLogin(data: any) {
+    let role, tableName;
+    tableName = "users";
+    const userQueryResult = await this._executeQuery(
+      "SELECT id,concat(first_name, last_name)as username,email, password,status FROM " +
+        tableName +
+        " WHERE email = ?",
+      [data.email]
+    );
+    if (userQueryResult.length !== 0) {
+      userQueryResult[0].role = "user";
+      return userQueryResult;
+    } else {
+      // Check the admin table
+      tableName = "admin";
+      const adminQueryResult = await this._executeQuery(
+        "SELECT id,concat(first_name, last_name)as username, email, password, status FROM " +
+          tableName +
+          " WHERE email = ?",
+        [data.email]
+      );
+      if (adminQueryResult.length !== 0) {
+        adminQueryResult[0].role = "admin";
+        return adminQueryResult;
+      } else {
+        // Check the vendor table
+        tableName = "vendors";
+        const vendorQueryResult = await this._executeQuery(
+          "SELECT id,concat(first_name, last_name)as username, email, password,status FROM " +
+            tableName +
+            " WHERE email = ? ",
+          [data.email]
+        );
+        if (vendorQueryResult.length !== 0) {
+          vendorQueryResult[0].role = "vendor";
+          return vendorQueryResult;
+        } else {
+          // Check the driver table
+          tableName = "drivers";
+          const driverQueryResult = await this._executeQuery(
+            "SELECT id,concat(first_name, last_name)as username, email, password,status FROM " +
+              tableName +
+              " WHERE email = ? ",
+            [data.email]
+          );
+          if (driverQueryResult.length !== 0) {
+            driverQueryResult[0].role = "driver";
+            return driverQueryResult;
+          }
+          return driverQueryResult;
+        }
+      }
     }
-    async getUser(data:any){
-        let results = await this._executeQuery("select id,email,password from users where email = ? ", [data.email]);
-        return results;
-    }
-    async createUser(userData:any){
-        let registerResult = await this._executeQuery("insert into users set ?",[userData]);
-        return registerResult;
-    }
-    async getRole(name:any){
-        let role = await this._executeQuery(" select id,name from user_roles where name = ?",[name]);
-        return role;
-    }
-    // 'UPDATE users SET reset_token = $1, reset_token_expires_at = $2 WHERE email = $3',
-    //   [resetToken, resetTokenExpiration, email]
-    async setResetToken(data:any){
-        let query = await this._executeQuery("update users set reset_token = ? , token_expire = ? where email = ? ",[data.reset_token, data.token_expire,data.email]);
-        // console.log("query result in model------------->", query)
-        return query 
-    }
+  }
+  async getUserRole(role: string) {
+    let result = await this._executeQuery(
+      "select id,name, status from user_roles where name = ? ",
+      [role]
+    );
+    return result;
+  }
+  async createUser(userData: any, tableName: string) {
+    let registerResult = await this._executeQuery(
+      `INSERT INTO ${tableName} SET ?`,
+      [userData]
+    );
+    return registerResult;
+  }
 }

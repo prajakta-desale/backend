@@ -1,22 +1,10 @@
-const base = '/api';
+const base = "/api";
 
 export default {
-    url: {
-        base,
-    },
-    timers: {
-
-    },
-    env: {
-
-    },
-    authorizationIgnorePath: [
-        `/user/register`,
-        `/user/login`,
-        `/vendor/register`,
-        `/admin/sign-in`,
-        `/admin/register`,
-        `/user/reset-pass`
-    ],
+  url: {
+    base,
+  },
+  timers: {},
+  env: {},
+  authorizationIgnorePath: [`/user/register`, `/user/sign-in`],
 };
-

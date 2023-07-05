@@ -1,25 +1,18 @@
-import express from 'express';
-
-import userController from '../../Controllers/User.controller';
-import userSchema from '../../Constants/Schema/User.schema';
-
+import userController from "../../Controllers/User.controller";
+import path from "path";
+import express from "express";
+import { celebrate } from "celebrate";
+import UserSchema from "../../Constants/Schema/User.schema";
 const router = express.Router();
-import { celebrate } from 'celebrate';
-
 router.post(
-    '/register',
-    // celebrate(userSchema.register),
-    userController.register,
-);
-
-router.post(
-    '/login',
-    // celebrate(userSchema.login),
-    userController.login,
+  "/sign-in",
+  // celebrate( adminSchema.login ),
+  userController.login
 );
 router.post(
-    '/reset-pass',
-    userController.resetPasswordLink,
+  "/register",
+  celebrate(UserSchema.register),
+  userController.register
 );
 
 export default router;

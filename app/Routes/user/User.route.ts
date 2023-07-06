@@ -6,13 +6,12 @@ import UserSchema from "../../Constants/Schema/User.schema";
 const router = express.Router();
 router.post(
   "/sign-in",
-  // celebrate( adminSchema.login ),
+  // celebrate(UserSchema.login),
   userController.login
 );
 router.post(
   "/register",
-  celebrate(UserSchema.register),
+  // celebrate(UserSchema.register),
   userController.register
 );
-
 export default router;

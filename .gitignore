@@ -1,0 +1,9 @@
+# Dependency directories
+node_modules/
+
+#build directories
+bin/
+
+package-lock.json
+combined.log
+error.log

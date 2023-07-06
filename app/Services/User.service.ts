@@ -4,9 +4,6 @@ import Encryption from "../utilities/Encryption";
 const userLogin = async (data: any) => {
   try {
     let result = await new UserModel().getUser(data);
-    // let roleName = await new UserModel().getUserRole(result[0].role_id);
-    // console.log("in service--------->", roleName);
-    // result[0].role = roleName[0].name;
     if (result.length === 0) throw new Error("Invalid email or password");
     const match = await new Encryption().verifypassword(
       data.password,
@@ -15,7 +12,19 @@ const userLogin = async (data: any) => {
     if (!match) throw new Error("Invalid password");
     delete result[0].password;
     if (result[0].status !== 1) throw new Error("Your account is not active");
-
+    let role;
+    switch (result[0].role_id) {
+      case 1:
+        result[0].role = "admin";
+        break;
+      case 2:
+        result[0].role = "JobProvider";
+        break;
+      case 3:
+        result[0].role = "JobSeeker";
+        break;
+    }
+    delete result[0].role_id;
     return {
       token: await Encryption.generateJwtToken({ id: result[0].id }),
       user: result,

@@ -67,7 +67,37 @@ const createUser = async (data: any) => {
     throw error;
   }
 };
+const UserAccessManager = async (data: any) => {
+  try {
+    const existingUser = await new UserModel().getUserByGoogleId(data.googleId);
+    if (existingUser.length !== 0) {
+      console.log("Existing Google User", existingUser[0]);
+      delete existingUser[0].password;
+      delete existingUser[0].googleId;
+      return {
+        token: await Encryption.generateJwtToken({ id: existingUser[0].id }),
+        user: existingUser[0],
+      };
+    }
+    const newUser = await new UserModel().createUserByGoogleAuth(data);
+    const user = await new UserModel().getUserById(newUser.insertId);
+    console.log("New Google User", user[0]);
+    if (user.length !== 0) {
+      delete user[0].password;
+      delete user[0].googleId;
+      return {
+        token: await Encryption.generateJwtToken({ id: user[0].id }),
+        user: user[0],
+      };
+    }
+    return { message: "Something Went Wrong", suc: false };
+  } catch (error: any) {
+    console.log("Error google auth:", error.message);
+    return error;
+  }
+};
 export default {
   userLogin,
   createUser,
+  UserAccessManager,
 };

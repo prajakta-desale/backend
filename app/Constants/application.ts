@@ -6,5 +6,12 @@ export default {
   },
   timers: {},
   env: {},
-  authorizationIgnorePath: [`/user/register`, `/user/sign-in`],
+  authorizationIgnorePath: [
+    `/user/register`,
+    `/user/sign-in`,
+    `/user/google`,
+    `/user/google/callback`,
+    `/user/test-google-protected`,
+    `/user/logout`,
+  ],
 };

@@ -1,6 +1,6 @@
-import { NextFunction, Request, Response } from 'express';
-import HttpStatusCode from 'http-status-codes';
-import ApiResponse from './ApiResponse';
+import { NextFunction, Request, Response } from "express";
+import HttpStatusCode from "http-status-codes";
+import ApiResponse from "./ApiResponse";
 
 const extractQueryForRequest = (req: Request, query: string) => {
   if (req.query[query]) {
@@ -29,7 +29,4 @@ const extractCookieFromRequest = (req: Request, key: string) => {
   return null;
 };
 
-export {
-  extractQueryForRequest,
-  extractCookieFromRequest,
-};
+export { extractQueryForRequest, extractCookieFromRequest };

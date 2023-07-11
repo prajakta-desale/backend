@@ -30,10 +30,10 @@ app.use(function (req, res, next) {
   next();
 });
 require("dotenv").config();
+app.use(cors());
 app.use(bodyParser.json());
 app.use(morgan("dev"));
 app.use(Authenticate);
-app.use(cors());
 app.use(
   session({
     secret: "job-portal",

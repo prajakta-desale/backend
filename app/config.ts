@@ -6,7 +6,7 @@ export = {
     host: env.MASTER_DB_HOST || "localhost",
     user: env.MASTER_DB_USER || "root",
     password: env.MASTER_DB_PASSWORD || "7699",
-    database: env.MASTER_DB_NAME || "jobportal",
+    database: env.MASTER_DB_NAME || "job-portal",
     timezone: "utc",
   },
   JwtToken: {
